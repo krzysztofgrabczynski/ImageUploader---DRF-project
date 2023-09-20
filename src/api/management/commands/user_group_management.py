@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
     """
-    A command class which creates a new permission groups. 
+    A command class which creates a new permission groups.
     """
 
     help = "Command for creating a new permission groups."
