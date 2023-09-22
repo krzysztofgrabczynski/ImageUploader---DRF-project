@@ -24,7 +24,7 @@ class ImageAPIView(generics.CreateAPIView):
         super().get_serializer_class()
 
         tier = TierResponseClass.get_tier(self.request.user)
-        if tier.renew_url_perm:
+        if tier.change_expiration_time_perm:
             return ExtendImageSerializer
         return BasicImageSerializer
 

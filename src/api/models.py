@@ -44,6 +44,12 @@ class TierModel(models.Model):
     renew_url_perm = models.BooleanField(
         default=False, blank=False, null=True, verbose_name="RENEW URL PERMISSION"
     )
+    change_expiration_time_perm = models.BooleanField(
+        default=False,
+        blank=False,
+        null=True,
+        verbose_name="CHANGE EXPIRE TIME PERMISSION",
+    )
 
     def __str__(self) -> str:
         return self.name
