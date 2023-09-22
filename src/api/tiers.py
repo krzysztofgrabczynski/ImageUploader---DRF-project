@@ -1,37 +1,74 @@
-from abc import ABC, abstractstaticmethod
-from rest_framework import status
+from django.urls import reverse
+from django.core import signing
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.auth.models import User
+from rest_framework import status, exceptions
+from rest_framework.request import Request
 from rest_framework.response import Response
+from PIL import Image
+import os
+import uuid
+from typing import List
+
+from core.settings import MEDIA_ROOT
+from api.models import URLExpirationModel, UserTierModel
 
 
-class BaseTierClass(ABC):
+class TierResponseClass:
     """
-    Abstract class representing a tiers.
-    Abstract static method `get_response` needs to be overridden by subclasses.
-    Method `class_name` gives tier name as permission gropu names.
+    A class with methods to manage imgaes and urls due to specific account tier.
     """
 
-    @abstractstaticmethod
-    def get_response(serializer):
-        pass
-
-    @classmethod
-    def class_name(cls):
-        return cls.__name__.replace("Tier", "")
-
-
-class BasicTier(BaseTierClass):
     @staticmethod
-    def get_response(serializer):
-        return Response("basic", status=status.HTTP_201_CREATED)
+    def create_resized_thumbnail(
+        serialized_img: InMemoryUploadedFile, sizes_list: List
+    ) -> None:
+        """
+        Creates a thumbnail resized due to `sizes_list` parameter.
+        Filename is craeted with uuid() generator and with suffix due to size of the image.
 
+        :param InMemoryUploadedFile serialized_img: image from serialized data
+        :param List sizes_list: list of thumbnail sizes to resize images
+        """
 
-class PremiumTier(BaseTierClass):
+        for size in sizes_list:
+            image = Image.open(serialized_img)
+            image.thumbnail([int(size), int(size)])
+
+            filename_suffix = f"_{size}px"
+            filename = "".join([str(uuid.uuid4()), filename_suffix, ".jpg"])
+            new_path = os.path.join(MEDIA_ROOT, "images", filename)
+
+            image.save(new_path, "JPEG")
+
     @staticmethod
-    def get_response(serializer):
-        return Response("premium", status=status.HTTP_201_CREATED)
+    def create_image_url(request: Request, sizes_list: List) -> Response:
+        """
+        Creates a url/s for a thumbnail/s using URLExpirationModel model.
 
+        :param Request request: request
+        :param List sizes_list: list of thumbnail sizes to resize images
+        """
 
-class EnterpriseTier(BaseTierClass):
+        url_dict = dict()
+
+        for size in sizes_list:
+            new_url_obj = URLExpirationModel.objects.create(user=request.user)
+            url = request.build_absolute_uri(
+                reverse(
+                    "url",
+                    kwargs={"url_pk": signing.dumps(new_url_obj.pk), "image_pk": 1},
+                )
+            )
+            url_dict[size] = url
+
+        return Response({"urls": url_dict}, status=status.HTTP_201_CREATED)
+
     @staticmethod
-    def get_response(serializer):
-        return Response("enteprise", status=status.HTTP_201_CREATED)
+    def get_tier(user: User) -> UserTierModel:
+        try:
+            return UserTierModel.objects.get(user=user).get_tier_obj()
+        except UserTierModel.DoesNotExist:
+            raise exceptions.PermissionDenied(
+                "You do not have permission or group permission to perform this action."
+            )
