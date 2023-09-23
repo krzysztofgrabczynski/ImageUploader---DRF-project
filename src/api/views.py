@@ -49,7 +49,13 @@ class ImageAPIView(generics.CreateAPIView):
         TierResponseClass.create_resized_thumbnail(
             serializer.validated_data["img"], tier.get_sizes_list()
         )
-        response = TierResponseClass.create_image_url(request, tier.get_sizes_list())
+        response = TierResponseClass.create_image_url(
+            request,
+            tier.get_sizes_list(),
+            serializer.validated_data.get(
+                "url_expiration_time", ImageModel.url_expiration_time.field.default
+            ),
+        )
 
         try:
             return response

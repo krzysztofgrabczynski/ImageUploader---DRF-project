@@ -55,7 +55,11 @@ class RenewURLMixin:
     permission_classes = [CanRenewURLPermission]
 
     def post(self, request, *args, **kwargs):
-        self.delete_expired_url(**kwargs)
+        url_model = URLExpirationModel.objects.get(
+            pk=signing.loads(kwargs["url_to_renew_pk"])
+        )
+        expiration_time = url_model.expiration
+        url_model.delete()
 
         image_pk = kwargs["image_pk"]
 
@@ -63,7 +67,8 @@ class RenewURLMixin:
         serializer.is_valid(raise_exception=True)
 
         if serializer.validated_data["renew_url"]:
-            url = TierResponseClass.create_url(request, image_pk)
+            print("jestem w nowyum linku")
+            url = TierResponseClass.create_url(request, image_pk, expiration_time)
             return Response(url)
 
         return Response("Check 'Renew url' for renew image url")
