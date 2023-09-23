@@ -39,3 +39,11 @@ class AccountTierSerializer(serializers.ModelSerializer):
     class Meta:
         model = TierModel
         fields = "__all__"
+
+
+class RenewURLSerializer(serializers.Serializer):
+    """
+    Serializer for renew URL functionality.
+    """
+
+    renew_url = serializers.BooleanField(default=False)
