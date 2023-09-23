@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import ImageModel
+from api.models import ImageModel, TierModel
 
 
 class BasicImageSerializer(serializers.ModelSerializer):
@@ -28,4 +28,14 @@ class ExtendImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImageModel
+        fields = "__all__"
+
+
+class AccountTierSerializer(serializers.ModelSerializer):
+    """
+    A serializer class for serializing data of the TierModel model.
+    """
+    
+    class Meta:
+        model = TierModel
         fields = "__all__"
