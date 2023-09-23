@@ -24,6 +24,7 @@ class URLExpirationModel(models.Model):
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    img_filename = models.CharField(null=True)
     start_date = models.DateTimeField(auto_now_add=True)
     expiration = models.IntegerField(default=10)
     renew_url_permission = models.BooleanField(default=False)

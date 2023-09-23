@@ -1,8 +1,6 @@
 from rest_framework import generics, exceptions
-from rest_framework.response import Response
-from django.core import signing
 
-from api.models import ImageModel, URLExpirationModel, TierModel
+from api.models import ImageModel, TierModel
 from api.serializers import (
     BasicImageSerializer,
     ExtendImageSerializer,
@@ -46,16 +44,7 @@ class ImageAPIView(generics.CreateAPIView):
         self.perform_create(serializer)
 
         tier = TierResponseClass.get_tier(request.user)
-        TierResponseClass.create_resized_thumbnail(
-            serializer.validated_data["img"], tier.get_sizes_list()
-        )
-        response = TierResponseClass.create_image_url(
-            request,
-            tier.get_sizes_list(),
-            serializer.validated_data.get(
-                "url_expiration_time", ImageModel.url_expiration_time.field.default
-            ),
-        )
+        response = TierResponseClass.create_resized_thumbnail(request, serializer, tier)
 
         try:
             return response
@@ -88,14 +77,15 @@ class CreateAccountTierAPIView(CreateAccountTierMixin, generics.CreateAPIView):
     serializer_class = AccountTierSerializer
 
 
-class URLAPIVView(URLExpirationMixin, generics.RetrieveAPIView):
+class URLAPIVView(URLExpirationMixin, generics.GenericAPIView):
     """
     A view class for GET method to retrieve url (image/thumbnail) if url is still available.
     It uses `URLExpirationMixin` mixin for url expiration functionality.
     """
 
-    queryset = URLExpirationModel()
-    lookup_field = "image_pk"
+    queryset = ImageModel.objects.all()
+    serializer_class = BasicImageSerializer
+    media_root_url = "http://localhost:8000/media/images/"
 
 
 class RenewURLAPIView(RenewURLMixin, generics.GenericAPIView):

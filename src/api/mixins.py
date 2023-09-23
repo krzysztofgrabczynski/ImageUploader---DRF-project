@@ -24,24 +24,22 @@ class URLExpirationMixin:
             signing.loads(kwargs["url_pk"], max_age=url_model.expiration)
         except signing.BadSignature:
             tier = TierResponseClass.get_tier(self.request.user)
+
             if tier.renew_url_perm:
-                url = self.renew_url(request, url_model.pk, kwargs["image_pk"])
+                url = self.renew_url(request, url_model.pk)
                 return Response({"url": f"If you want to renew url click: {url}"})
             else:
                 raise exceptions.PermissionDenied(
                     "Link that you trying to access expired or does not exist."
                 )
 
-        super().get(request, *args, **kwargs)
+        return Response(self.media_root_url + url_model.img_filename)
 
-    def renew_url(self, request, url_to_renew_pk: int, image_pk: int):
+    def renew_url(self, request, url_to_renew_pk: int) -> str:
         return request.build_absolute_uri(
             reverse(
                 "renew_url",
-                kwargs={
-                    "url_to_renew_pk": signing.dumps(url_to_renew_pk),
-                    "image_pk": image_pk,
-                },
+                kwargs={"url_to_renew_pk": signing.dumps(url_to_renew_pk)},
             )
         )
 
@@ -59,20 +57,13 @@ class RenewURLMixin:
             pk=signing.loads(kwargs["url_to_renew_pk"])
         )
         expiration_time = url_model.expiration
-        url_model.delete()
-
-        image_pk = kwargs["image_pk"]
+        filename = url_model.img_filename
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         if serializer.validated_data["renew_url"]:
-            print("jestem w nowyum linku")
-            url = TierResponseClass.create_url(request, image_pk, expiration_time)
+            url = TierResponseClass.create_url(request, filename, expiration_time)
             return Response(url)
 
         return Response("Check 'Renew url' for renew image url")
-
-    def delete_expired_url(self, **kwargs):
-        url_model_pk = signing.loads(kwargs["url_to_renew_pk"])
-        URLExpirationModel.objects.get(pk=url_model_pk).delete()
