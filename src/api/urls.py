@@ -5,6 +5,7 @@ from api.views import (
     ListImageAPIView,
     URLAPIVView,
     CreateAccountTierAPIView,
+    RenewURLAPIView,
 )
 
 
@@ -12,5 +13,10 @@ urlpatterns = [
     path("upload/", ImageAPIView.as_view(), name="upload_image"),
     path("list_images/", ListImageAPIView.as_view(), name="list_images"),
     path("<str:url_pk>/<int:image_pk>/", URLAPIVView.as_view(), name="url"),
-    path("create_tier", CreateAccountTierAPIView.as_view(), name="create_tier"),
+    path("create_tier/", CreateAccountTierAPIView.as_view(), name="create_tier"),
+    path(
+        "renew_url/<str:url_to_renew_pk>/<int:image_pk>/",
+        RenewURLAPIView.as_view(),
+        name="renew_url",
+    ),
 ]
