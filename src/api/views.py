@@ -1,9 +1,9 @@
 from rest_framework import generics, exceptions
-from django.core import signing
 
-from api.models import ImageModel, URLExpirationModel
-from api.serializers import BasicImageSerializer, ExtendImageSerializer
+from api.models import ImageModel, URLExpirationModel, TierModel
+from api.serializers import BasicImageSerializer, ExtendImageSerializer, AccountTierSerializer
 from api.tiers import TierResponseClass
+from api.mixins import CreateAccountTierMixin, URLExpirationMixin
 
 
 class ImageAPIView(generics.CreateAPIView):
@@ -65,23 +65,22 @@ class ListImageAPIView(generics.ListAPIView):
         return queryset.filter(user=self.request.user)
 
 
-class URLView(generics.RetrieveAPIView):
+class URLAPIVView(URLExpirationMixin, generics.RetrieveAPIView):
     """
     A View class for GET method to retrieve url (image/thumbnail) if url is still available.
-    In case of timeout, `signing.loads` method will raise `BadSignature` exception and url will be deactivate.
+    It uses `URLExpirationMixin` mixin for url expiration functionality.
     """
 
     queryset = URLExpirationModel()
     lookup_field = "image_pk"
 
-    def get(self, request, *args, **kwargs):
-        url_model = URLExpirationModel.objects.get(pk=signing.loads(kwargs["url_pk"]))
-        try:
-            signing.loads(kwargs["url_pk"], max_age=url_model.expiration)
-        except signing.BadSignature:
-            url_model.delete()
-            raise exceptions.PermissionDenied(
-                "Link that you trying to access expired or does not exist."
-            )
 
-        super().get(request, *args, **kwargs)
+class CreateAccountTierAPIView(CreateAccountTierMixin, generics.CreateAPIView):
+    """
+    A view for creating a new account tier. 
+    `CreateAccountTierMixin` check if the user get permission to create a new account tier model.
+    """
+    
+    queryset = TierModel.objects.all()
+    serializer_class = AccountTierSerializer
+    
