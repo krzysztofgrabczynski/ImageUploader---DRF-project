@@ -41,8 +41,8 @@ class TierResponseClass:
 
             image.save(new_path, "JPEG")
 
-    @staticmethod
-    def create_image_url(request: Request, sizes_list: List) -> Response:
+    @classmethod
+    def create_image_url(cls, request: Request, sizes_list: List) -> Response:
         """
         Creates a url/s for a thumbnail/s using URLExpirationModel model.
 
@@ -53,16 +53,21 @@ class TierResponseClass:
         url_dict = dict()
 
         for size in sizes_list:
-            new_url_obj = URLExpirationModel.objects.create(user=request.user)
-            url = request.build_absolute_uri(
-                reverse(
-                    "url",
-                    kwargs={"url_pk": signing.dumps(new_url_obj.pk), "image_pk": 1},
-                )
-            )
+            url = cls.create_url(request, 1)
             url_dict[size] = url
 
         return Response({"urls": url_dict}, status=status.HTTP_201_CREATED)
+
+    @classmethod
+    def create_url(self, request, image_pk: int) -> str:
+        new_url_obj = URLExpirationModel.objects.create(user=request.user)
+        url = request.build_absolute_uri(
+            reverse(
+                "url",
+                kwargs={"url_pk": signing.dumps(new_url_obj.pk), "image_pk": image_pk},
+            )
+        )
+        return url
 
     @staticmethod
     def get_tier(user: User) -> UserTierModel:
