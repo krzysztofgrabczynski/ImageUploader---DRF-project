@@ -1,13 +1,16 @@
 from rest_framework import generics, exceptions
+from rest_framework.response import Response
+from django.core import signing
 
 from api.models import ImageModel, URLExpirationModel, TierModel
 from api.serializers import (
     BasicImageSerializer,
     ExtendImageSerializer,
     AccountTierSerializer,
+    RenewURLSerializer,
 )
 from api.tiers import TierResponseClass
-from api.mixins import CreateAccountTierMixin, URLExpirationMixin
+from api.mixins import CreateAccountTierMixin, URLExpirationMixin, RenewURLMixin
 
 
 class ImageAPIView(generics.CreateAPIView):
@@ -69,16 +72,6 @@ class ListImageAPIView(generics.ListAPIView):
         return queryset.filter(user=self.request.user)
 
 
-class URLAPIVView(URLExpirationMixin, generics.RetrieveAPIView):
-    """
-    A View class for GET method to retrieve url (image/thumbnail) if url is still available.
-    It uses `URLExpirationMixin` mixin for url expiration functionality.
-    """
-
-    queryset = URLExpirationModel()
-    lookup_field = "image_pk"
-
-
 class CreateAccountTierAPIView(CreateAccountTierMixin, generics.CreateAPIView):
     """
     A view for creating a new account tier.
@@ -87,3 +80,21 @@ class CreateAccountTierAPIView(CreateAccountTierMixin, generics.CreateAPIView):
 
     queryset = TierModel.objects.all()
     serializer_class = AccountTierSerializer
+
+
+class URLAPIVView(URLExpirationMixin, generics.RetrieveAPIView):
+    """
+    A view class for GET method to retrieve url (image/thumbnail) if url is still available.
+    It uses `URLExpirationMixin` mixin for url expiration functionality.
+    """
+
+    queryset = URLExpirationModel()
+    lookup_field = "image_pk"
+
+
+class RenewURLAPIView(RenewURLMixin, generics.GenericAPIView):
+    """
+    A view class for POST method to create a new active url for image/thumbnail.
+    """
+
+    serializer_class = RenewURLSerializer
