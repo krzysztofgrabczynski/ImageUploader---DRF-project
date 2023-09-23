@@ -35,7 +35,7 @@ class AccountTierSerializer(serializers.ModelSerializer):
     """
     A serializer class for serializing data of the TierModel model.
     """
-    
+
     class Meta:
         model = TierModel
         fields = "__all__"

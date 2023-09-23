@@ -1,7 +1,11 @@
 from rest_framework import generics, exceptions
 
 from api.models import ImageModel, URLExpirationModel, TierModel
-from api.serializers import BasicImageSerializer, ExtendImageSerializer, AccountTierSerializer
+from api.serializers import (
+    BasicImageSerializer,
+    ExtendImageSerializer,
+    AccountTierSerializer,
+)
 from api.tiers import TierResponseClass
 from api.mixins import CreateAccountTierMixin, URLExpirationMixin
 
@@ -77,10 +81,9 @@ class URLAPIVView(URLExpirationMixin, generics.RetrieveAPIView):
 
 class CreateAccountTierAPIView(CreateAccountTierMixin, generics.CreateAPIView):
     """
-    A view for creating a new account tier. 
+    A view for creating a new account tier.
     `CreateAccountTierMixin` check if the user get permission to create a new account tier model.
     """
-    
+
     queryset = TierModel.objects.all()
     serializer_class = AccountTierSerializer
-    

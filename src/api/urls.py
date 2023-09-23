@@ -1,6 +1,11 @@
 from django.urls import path
 
-from api.views import ImageAPIView, ListImageAPIView, URLAPIVView, CreateAccountTierAPIView
+from api.views import (
+    ImageAPIView,
+    ListImageAPIView,
+    URLAPIVView,
+    CreateAccountTierAPIView,
+)
 
 
 urlpatterns = [

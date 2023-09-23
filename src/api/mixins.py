@@ -12,9 +12,9 @@ class CreateAccountTierMixin:
 class URLExpirationMixin:
     """
     A class mixin for checking if the timeout of URL expired.
-    `signing.loads` method will raise `BadSignature` exception after timeout and url will be deactivate. 
+    `signing.loads` method will raise `BadSignature` exception after timeout and url will be deactivate.
     """
-   
+
     def get(self, request, *args, **kwargs):
         url_model = URLExpirationModel.objects.get(pk=signing.loads(kwargs["url_pk"]))
         try:
