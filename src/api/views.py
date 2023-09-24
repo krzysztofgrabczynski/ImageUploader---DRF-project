@@ -36,7 +36,7 @@ class ImageAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         """
         This method uploads a new image and uses `TierResponseClass` methods for further image/url specific operations.
-        Creates resized thumbnailes and urls.
+        Creates resized thumbnailes and urls to access them.
         """
 
         serializer = self.get_serializer(data=request.data)
@@ -85,7 +85,6 @@ class URLAPIVView(URLExpirationMixin, generics.GenericAPIView):
 
     queryset = ImageModel.objects.all()
     serializer_class = BasicImageSerializer
-    media_root_url = "http://localhost:8000/media/images/"
 
 
 class RenewURLAPIView(RenewURLMixin, generics.GenericAPIView):
