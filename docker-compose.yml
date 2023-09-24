@@ -14,6 +14,13 @@ services:
     image: postgres:12
     env_file:
       - .env
+  s3:
+    image: minio/minio
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    command: minio server /data
 
 volumes:
   media:
