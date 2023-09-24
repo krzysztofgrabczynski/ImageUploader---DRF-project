@@ -7,7 +7,6 @@ services:
       - "8000:8000"
     volumes:
       - .:/code:z
-      - ./src/media:/code/src/media:z
     depends_on:
       - db
   db:
@@ -21,6 +20,3 @@ services:
     ports:
       - "9000:9000"
     command: minio server /data
-
-volumes:
-  media:
