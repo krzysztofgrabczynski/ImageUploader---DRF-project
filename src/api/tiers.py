@@ -5,10 +5,10 @@ from rest_framework import status, exceptions
 from rest_framework.response import Response
 from PIL import Image
 import os
+from io import BytesIO
 import uuid
-from typing import List
 
-from core.settings import MEDIA_ROOT
+from api.s3 import AWSServices
 from api.models import URLExpirationModel, UserTierModel, ImageModel
 
 
@@ -22,45 +22,49 @@ class TierResponseClass:
         cls, request, serializer, tier: UserTierModel
     ) -> Response:
         """
-        Creates a thumbnail resized due to `sizes_list` parameter.
-        Filename is craeted with uuid() generator and with suffix due to size of the image.
-        Uses 'create_url' method to create url for the thumbnail.
+        Creates a resized thumbnail/s and save to s3 storage.
+        It provieds as result url/s to view thumbnail/s. Url has expiration time due to expiration time in ImageModel (defaul or provided by user).
+        It ueses `AWSServices` for operations such as upload new image to s3 or get url to that img.
 
-        :param Request request: uses for `create_url` method
-        :param ModelSerializer serializer: serializer with validated data
+        :param request: request object.
+        :param serializer: serializer object with serialized data for ImageModel instance.
         :param UserTierModel tier: UserTierModel object with data about list of thumbnails sizes and `get_origin_img` boolean.
         """
 
         url_dict = dict()
-        serialized_img = serializer.validated_data["img"]
+        sizes_list = tier.get_sizes_list()
         expiration_time = serializer.validated_data.get(
             "url_expiration_time", ImageModel.url_expiration_time.field.default
         )
-        sizes_list = tier.get_sizes_list()
+
+        original_img_root = f"""media/{serializer.validated_data["img"]}"""
+        image_data = AWSServices.get_object_from_s3(original_img_root)
 
         for size in sizes_list:
-            image = Image.open(serialized_img)
+            image = Image.open(BytesIO(image_data))
             image.thumbnail([int(size), int(size)])
+            output_buffer = BytesIO()
+            image.save(output_buffer, format="JPEG")
 
             filename_suffix = f"_{size}px"
             filename = "".join([str(uuid.uuid4()), filename_suffix, ".jpg"])
-            new_path = os.path.join(MEDIA_ROOT, "images", filename)
+            new_obj_name = os.path.join("media/", filename)
 
-            image.save(new_path, "JPEG")
+            AWSServices.put_object_to_AWS(new_obj_name, output_buffer.getvalue())
+            url = AWSServices.generate_url(new_obj_name)
 
-            url_dict[size] = cls.create_url(request, filename, expiration_time)
+            url_dict[size] = cls.create_url(request, url, expiration_time)
 
         if tier.get_origin_img:
-            url_dict["origin_img"] = cls.create_url(
-                request, serialized_img, expiration_time
-            )
+            url = AWSServices.generate_url(original_img_root)
+            url_dict["origin_img"] = cls.create_url(request, url, expiration_time)
 
         return Response({"urls": url_dict}, status=status.HTTP_201_CREATED)
 
     @classmethod
-    def create_url(self, request, filename: str, expiration_time: int) -> str:
+    def create_url(self, request, url: str, expiration_time: int) -> str:
         new_url_obj = URLExpirationModel.objects.create(
-            user=request.user, img_filename=filename, expiration=expiration_time
+            user=request.user, img_filename=url, expiration=expiration_time
         )
         url = request.build_absolute_uri(
             reverse(
