@@ -12,7 +12,7 @@ class ImageModel(models.Model):
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
-    img = models.ImageField(upload_to="images/", null=False, blank=False)
+    img = models.ImageField(upload_to="media/", null=False, blank=False)
     url_expiration_time = models.IntegerField(default=10)
 
 

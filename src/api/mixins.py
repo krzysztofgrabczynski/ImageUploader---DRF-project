@@ -33,7 +33,7 @@ class URLExpirationMixin:
                     "Link that you trying to access expired or does not exist."
                 )
 
-        return Response(self.media_root_url + url_model.img_filename)
+        return Response(url_model.img_filename)
 
     def renew_url(self, request, url_to_renew_pk: int) -> str:
         return request.build_absolute_uri(
