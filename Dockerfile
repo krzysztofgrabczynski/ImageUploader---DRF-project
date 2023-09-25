@@ -1,5 +1,7 @@
 FROM python:3.11
 
+ENV DJANGO_SETTINGS_MODULE core.settings
+
 WORKDIR /code
 
 COPY requirements.txt /code/
