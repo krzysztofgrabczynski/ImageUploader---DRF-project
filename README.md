@@ -58,6 +58,7 @@ If you want to check out my other projects [click here.](https://github.com/krzy
 - Create .env file and add requirement variables such as 'SECRET_KEY' or database parameters
 - Build the Docker image using ``` docker-compose build ```
 - Run containers using ``` docker-compose up ```
+- Enter the ``` python manage.py migrate ``` to create migrations
 - Everything done! 
 
 
@@ -70,6 +71,12 @@ If you want to check out my other projects [click here.](https://github.com/krzy
 - Enter the ``` python manage.py migrate --run-syncdb ``` to update migrations
 - Now, you can run the application with this: ``` python manage.py runserver ```
 - Everything done! You can open Instagram app in your browser by ctrl + left click on http link in your console
+
+ ## How to use that app after installing
+ - create superuser using ``` python manage.py createsuperuser ```
+ - run custom command to create basic tier accounts ``` python manage.py user_group_management ```
+ - create some users on admin site and add them to speficic tier account
+ - Enjoy using this app :)
 
 
 
