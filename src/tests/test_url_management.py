@@ -3,7 +3,6 @@ from rest_framework.test import APIClient
 import time
 
 from tests.mixins import *
-from api.models import TierModel
 
 
 class TestUrlExpiration(CreateUserForTestMixin, TestCase):
