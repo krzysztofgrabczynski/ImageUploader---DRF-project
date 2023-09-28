@@ -19,8 +19,12 @@ class CreateUserForTestMixin:
         super().setUp()
 
     @staticmethod
-    def create_user(username: str, password: str = "example_password1!") -> User:
-        return User.objects.create_user(username=username, password=password)
+    def create_user(
+        username: str, password: str = "example_password1!", **extra_fields
+    ) -> User:
+        return User.objects.create_user(
+            username=username, password=password, **extra_fields
+        )
 
 
 class CreateTierForTestMixin:

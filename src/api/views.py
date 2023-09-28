@@ -56,7 +56,7 @@ class ImageAPIView(generics.CreateAPIView):
 
 class ListImageAPIView(generics.ListAPIView):
     """
-    A APIView for GET method to list images of the specific logged in user.
+    A APIView for GET method to list original images of the specific logged in user.
     """
 
     queryset = ImageModel.objects.all()
