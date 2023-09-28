@@ -28,7 +28,7 @@ class ExtendImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImageModel
-        fields = "__all__"
+        fields = ["user", "img", "url_expiration_time"]
 
 
 class AccountTierSerializer(serializers.ModelSerializer):
@@ -38,7 +38,13 @@ class AccountTierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TierModel
-        fields = "__all__"
+        fields = [
+            "name",
+            "thumbnail_sizes",
+            "get_origin_img",
+            "renew_url_perm",
+            "change_expiration_time_perm",
+        ]
 
 
 class RenewURLSerializer(serializers.Serializer):

@@ -6,6 +6,7 @@ from api.models import TierModel
 class Command(BaseCommand):
     """
     A command class which creates a built-in account tiers.
+    It should be used at the first start of the application to create defaults account tiers.
     """
 
     help = "Command for creating a built-in account tiers."

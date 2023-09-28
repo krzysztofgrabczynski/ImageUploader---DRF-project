@@ -23,8 +23,8 @@ class TierResponseClass:
     ) -> Response:
         """
         Creates a resized thumbnail/s and save to s3 storage.
-        It provieds as result url/s to view thumbnail/s. Url has expiration time due to expiration time in ImageModel (defaul or provided by user).
-        It ueses `AWSServices` for operations such as upload new image to s3 or get url to that img.
+        It provides as result url/s to view thumbnail/s. Url has expiration time due to expiration time in ImageModel (default or provided by user).
+        It uses `AWSServices` for operations such as upload new image to s3 or get url to that img.
 
         :param request: request object.
         :param serializer: serializer object with serialized data for ImageModel instance.
@@ -61,14 +61,14 @@ class TierResponseClass:
 
         return Response({"urls": url_dict}, status=status.HTTP_201_CREATED)
 
-    @classmethod
-    def create_url(self, request, url: str, expiration_time: int) -> str:
+    @staticmethod
+    def create_url(request, url: str, expiration_time: int) -> str:
         new_url_obj = URLExpirationModel.objects.create(
             user=request.user, img_filename=url, expiration=expiration_time
         )
         url = request.build_absolute_uri(
             reverse(
-                "url",
+                "image_url",
                 kwargs={"url_pk": signing.dumps(new_url_obj.pk)},
             )
         )
