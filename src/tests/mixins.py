@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.core import signing
 from django.urls import reverse
+from django.core.files.base import File
+from io import BytesIO
+from PIL import Image
 
 from api.models import TierModel, UserTierModel, URLExpirationModel
 
@@ -72,7 +75,7 @@ class CreateTierForTestMixin:
 class UserTierForTestMixin:
     """
     Mixin for testing.
-    Provide function to create a `UserTierModel` model object with given params.
+    Provides function to create a `UserTierModel` model object with given params.
     """
 
     @staticmethod
@@ -81,7 +84,10 @@ class UserTierForTestMixin:
 
 
 class URLForTestMixin:
-    """ """
+    """
+    Mixin for testing.
+    Provides function to create a `URLForTestModel` model object with given params.
+    """
 
     @staticmethod
     def create_url(
@@ -100,3 +106,21 @@ class URLForTestMixin:
     @staticmethod
     def hash_url_pk(pk: int, reverse_url: str) -> str:
         return reverse(reverse_url, kwargs={"url_pk": signing.dumps(pk)})
+
+
+class ImageForTestMixin:
+    """
+    Mixin for testing.
+    """
+
+    @staticmethod
+    def get_image_file(ext="jpeg"):
+        """
+        Create a image file.
+        """
+
+        file_obj = BytesIO()
+        image = Image.new("RGB", size=(50, 50))
+        image.save(file_obj, ext)
+        file_obj.seek(0)
+        return File(file_obj, name=f"test.{ext}")
