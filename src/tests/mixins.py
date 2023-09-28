@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
+from django.core import signing
+from django.urls import reverse
 
-from api.models import TierModel, UserTierModel
+from api.models import TierModel, UserTierModel, URLExpirationModel
 
 
 class CreateUserForTestMixin:
@@ -76,3 +78,25 @@ class UserTierForTestMixin:
     @staticmethod
     def add_tier_to_user(user: User, tier: TierModel) -> UserTierModel:
         return UserTierModel.objects.create(user=user, tier=tier)
+
+
+class URLForTestMixin:
+    """ """
+
+    @staticmethod
+    def create_url(
+        user: User = None,
+        img_filename: str = "example",
+        expiration: int = 10,
+        renew_url_permission: bool = False,
+    ) -> URLExpirationModel:
+        return URLExpirationModel.objects.create(
+            user=user,
+            img_filename=img_filename,
+            expiration=expiration,
+            renew_url_permission=renew_url_permission,
+        )
+
+    @staticmethod
+    def hash_url_pk(pk: int, reverse_url: str) -> str:
+        return reverse(reverse_url, kwargs={"url_pk": signing.dumps(pk)})
