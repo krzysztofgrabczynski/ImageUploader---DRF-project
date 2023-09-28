@@ -61,7 +61,7 @@ If you want to check out my other projects [click here.](https://github.com/krzy
 - Everything done! 
 
 
-## Install for local use (using local virtualn environment)
+## Install for local use (using local virtual environment)
 - Clone the repository
 - Create virtual environment using ``` python -m venv venv ``` in project directory
 - Use ``` . venv/Scripts/activate ``` to activate the virtual environment
