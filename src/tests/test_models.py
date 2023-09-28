@@ -34,7 +34,8 @@ class TestTierModel(CreateUserForTestMixin, CreateTierForTestMixin, TestCase):
         UserTierForTestMixin.add_tier_to_user(self.test_user, self.tier)
         UserTierForTestMixin.add_tier_to_user(user2, self.tier)
 
-        self.assertEqual(self.tier.get_tier_users(), [self.test_user, user2])
+        self.assertEqual(str(self.tier.get_tier_users()[0]), str(self.test_user))
+        self.assertEqual(str(self.tier.get_tier_users()[1]), str(user2))
 
     def test_get_sizes_list_method(self) -> None:
         """
