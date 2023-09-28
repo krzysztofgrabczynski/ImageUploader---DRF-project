@@ -19,7 +19,7 @@ class TestUrlExpiration(CreateUserForTestMixin, TestCase):
 
     def test_url_exporation_without_renew_url_perm(self) -> None:
         url_obj = URLForTestMixin.create_url(user=self.test_user, expiration=2)
-        url = URLForTestMixin.hash_url_pk(url_obj.pk)
+        url = URLForTestMixin.hash_url_pk(url_obj.pk, "image_url")
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
