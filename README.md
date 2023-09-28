@@ -54,7 +54,7 @@ If you want to check out my other projects [click here.](https://github.com/krzy
 ```
 
 ## Install for local use (using Docker)
-- Copy the repository
+- Clone the repository
 - Create .env file and add requirement variables such as 'SECRET_KEY' or database parameters
 - Build the Docker image using ``` docker-compose build ```
 - Run containers using ``` docker-compose up ```
@@ -62,7 +62,7 @@ If you want to check out my other projects [click here.](https://github.com/krzy
 
 
 ## Install for local use (using local virtualn environment)
-- Copy the repository
+- Clone the repository
 - Create virtual environment using ``` python -m venv venv ``` in project directory
 - Use ``` . venv/Scripts/activate ``` to activate the virtual environment
 - Install required packages by ``` pip install -r requirements.txt ```
