@@ -11,7 +11,7 @@ The project uses Docker, AWS for store files, PostgreSQL database and linters su
 
 If you want to check out my other projects [click here.](https://github.com/krzysztofgrabczynski)
 
-## Tool used in project
+## Tools used in project
 
 <p align=center><a href="https://www.python.org"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="60" height="60"/></a> 
 <a href="https://www.djangoproject.com/"> <img src="https://cdn.worldvectorlogo.com/logos/django.svg" alt="django" width="60" height="60"/> </a>
